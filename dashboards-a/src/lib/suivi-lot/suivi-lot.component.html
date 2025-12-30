@@ -1,0 +1,161 @@
+<div class="grid grid-cols-1 gap-4">
+  <kendo-card
+    width="100%"
+    [formGroup]="suiviLotService.formFilter">
+    @if ((editMode$ | async) === false) {
+    <kendo-card-body class="grid grid-cols-6 content-center">
+      <h6
+        kendoCardTitle
+        class="m-0 col-span-2 flex items-center">
+        Dashboard Suivi Lot - {{ getTitle | async }}
+      </h6>
+      <kendo-card-actions
+        class="col-span-4"
+        [layout]="'end'">
+        <portals-auto-refresher
+          [initialValue]="false"
+          (refreshTriggered)="search()"></portals-auto-refresher>
+        <div class="k-form-field">
+          @if ({ val: handleDateChange | async }; as val) {
+          <kendo-daterange>
+            <kendo-label text="Début">
+              <kendo-dateinput
+                kendoDateRangeStartInput
+                formControlName="startingDate"></kendo-dateinput>
+            </kendo-label>
+            <kendo-label text="Fin">
+              <kendo-dateinput
+                kendoDateRangeEndInput
+                formControlName="endDate"></kendo-dateinput>
+            </kendo-label>
+          </kendo-daterange>
+          }
+        </div>
+        <button
+          kendoButton
+          [svgIcon]="filterIcon"
+          (click)="toggleFilters()"></button>
+        <button
+          kendoButton
+          [svgIcon]="pencilIcon"
+          (click)="setEditMode(true)"></button>
+        <button
+          kendoButton
+          [fillMode]="'solid'"
+          [svgIcon]="arrowRotateCwIcon"
+          (click)="search()"></button>
+      </kendo-card-actions>
+    </kendo-card-body>
+    } @else {
+    <kendo-card-body class="flex justify-center gap-2 items-center">
+      <span
+        kendoCardSubtitle
+        class="m-0">
+        Déplacez ou redimensionnez vos widgets, puis terminez la modification.</span
+      >
+      <button
+        kendoButton
+        (click)="setEditMode(false)"
+        [themeColor]="'primary'">
+        Terminer la modification
+      </button>
+    </kendo-card-body>
+    } @if (filterOpen$ | async) {
+    <kendo-card-footer class="flex flex-nowrap justify-between gap-4 items-center">
+      <div class="flex gap-4 flex-wrap items-center">
+        <portals-dashboard-search-field
+          class="min-w-[250px]"
+          [field]="souscripteurField"></portals-dashboard-search-field>
+        <portals-dashboard-search-field
+          class="min-w-[250px]"
+          [field]="policeField"></portals-dashboard-search-field>
+        <portals-dashboard-search-field
+          class="min-w-[250px]"
+          [field]="numeroLotField"></portals-dashboard-search-field>
+        <portals-dashboard-search-field
+          class="min-w-[250px]"
+          [field]="adherentField"></portals-dashboard-search-field>
+        <portals-dashboard-search-field
+          class="min-w-[250px]"
+          [field]="numeroDeclarationField"></portals-dashboard-search-field>
+        @if (isExterne) {
+        <portals-dashboard-search-field
+          class="min-w-[250px]"
+          [field]="etatClientField"></portals-dashboard-search-field>
+        } @else {
+        <portals-dashboard-search-field
+          class="min-w-[250px]"
+          [field]="etatField"></portals-dashboard-search-field>
+        }
+        <portals-dashboard-search-field
+          class="min-w-[250px]"
+          [field]="typeRetourField"></portals-dashboard-search-field>
+        @if (!env.isSouscripteurClient) {
+        <portals-dashboard-search-field
+          class="col-span-5 min-w-[250px]"
+          [field]="thirdTagField"></portals-dashboard-search-field>
+        } @else {
+        <portals-dashboard-search-field
+          class="min-w-[250px]"
+          [field]="etatField"></portals-dashboard-search-field>
+        }
+        <kendo-card-actions [layout]="'start'">
+          <span class="margin-filter">
+            Filtrer sur Aujourd'hui
+            <kendo-switch
+              [checked]="(suiviLotService.filterForToday | async) ?? false"
+              (valueChange)="filterForTodayChange($event)">
+            </kendo-switch>
+          </span>
+        </kendo-card-actions>
+        @if((getTitle | async) === 'Liquidation Lot' && trigramme.authority === 'EBM') {
+        <kendo-card-actions
+         layout="start">
+          <span class="margin-filter">
+            Filtrer sur la police du lot
+            <kendo-svgicon
+              kendoTooltip
+              title="Le filtre sur la police fonctionne uniquement pour les lots d’arrivage dont les dossiers ont déjà commencé la saisie."
+              [icon]="infoCircleIcon"></kendo-svgicon>
+          </span>
+          <kendo-switch
+            [checked]="(suiviLotService.filterByPolice | async) ?? false"
+            (valueChange)="suiviLotService.filterByPolice.next($event)">
+          </kendo-switch>
+        </kendo-card-actions>
+        }
+         @if(trigramme.authority === 'AZM') {
+        <span class="margin-filter flex items-center gap-2">
+          <div>
+            Dossiers NextCare
+            <kendo-svgicon
+              kendoTooltip
+              title="Activer ce filtre pour afficher uniquement les données liées à Nextcare."
+              [icon]="infoCircleIcon"></kendo-svgicon>
+          </div>
+          <kendo-switch
+            [checked]="(suiviLotService.filterByNextcare | async) ?? false"
+            (valueChange)="suiviLotService.filterByNextcare.next($event)">
+          </kendo-switch>
+        </span>
+        }
+      </div>
+      <kendo-card-actions
+        class=""
+        [layout]="'end'">
+        <button
+          kendoButton
+          (click)="reset()">
+          Réinitialiser
+        </button>
+        <button
+          kendoButton
+          (click)="search()">
+          Appliquer
+        </button>
+      </kendo-card-actions>
+    </kendo-card-footer>
+    }
+  </kendo-card>
+  <router-outlet (activate)="onOutletLoaded($event, editModeSignal())"></router-outlet>
+</div>

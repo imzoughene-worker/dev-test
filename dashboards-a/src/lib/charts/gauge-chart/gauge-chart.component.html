@@ -1,0 +1,48 @@
+﻿<ng-container *ngTemplateOutlet="dataContainer"></ng-container>
+<ng-template #dataContainer>
+  @if (type === 'arc') {
+    <ng-container *ngTemplateOutlet="arcDataContainer"></ng-container>
+    <ng-template #arcDataContainer>
+      @if (data !== null && !isLoading) {
+        <div class="flex justify-center">
+          <kendo-arcgauge
+            class="max-w-full min-w-max"
+            [resizeRateLimit]="10"
+            [renderAs]="'svg'"
+            [value]="data.valuePrincipale!"
+            [scale]="{ max: 100, min: 0, labels: { visible: true, format: '{0}%' } }">
+            <ng-template
+              kendoArcGaugeCenterTemplate
+              let-value="value"
+              class="valeur-viz">
+              {{ principaleFormatted }} %
+            </ng-template>
+          </kendo-arcgauge>
+        </div>
+      } @else {
+        <p class="valeur-viz">N/A</p>
+      }
+    </ng-template>
+  } @else {
+    <ng-container *ngTemplateOutlet="dataContainer"></ng-container>
+    <ng-template #dataContainer>
+      @if (data !== null && !isLoading) {
+        <div class="grid h-full w-full content-center">
+          <kendo-circulargauge
+            [value]="data.valuePrincipale!"
+            [scale]="{ max: 100, min: 0 }">
+            <ng-template
+              kendoCircularGaugeCenterTemplate
+              let-value="value"
+              class="valeur-viz">
+              {{ principaleFormatted }}%
+            </ng-template>
+          </kendo-circulargauge>
+        </div>
+      }
+      @if (data === null) {
+        <p class="valeur-viz">N/A</p>
+      }
+    </ng-template>
+  }
+</ng-template>

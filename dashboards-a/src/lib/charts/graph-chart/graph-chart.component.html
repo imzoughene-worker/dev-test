@@ -1,0 +1,26 @@
+﻿<ng-container *ngTemplateOutlet="dataContainer"></ng-container>
+
+<ng-template #dataContainer>
+  @if (data !== null) {
+    @if (isLoading) {
+      <kendo-progressbar
+        [indeterminate]="true"
+      ></kendo-progressbar>
+    }
+    <div class="grid grid-cols-1 items-center w-full h-full">
+      <kendo-chart class="h-full">
+        <kendo-chart-category-axis>
+          <kendo-chart-category-axis-item [categories]="data.categories ?? []"></kendo-chart-category-axis-item>
+        </kendo-chart-category-axis>
+        <kendo-chart-series>
+          <kendo-chart-series-item
+            [type]="type"
+            [stack]="{ group: 'a' }"
+            [data]="data.values ?? []">
+            <kendo-chart-series-item-labels></kendo-chart-series-item-labels>
+          </kendo-chart-series-item>
+        </kendo-chart-series>
+      </kendo-chart>
+    </div>
+  }
+</ng-template>

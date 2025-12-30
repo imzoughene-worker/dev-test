@@ -1,0 +1,158 @@
+﻿<kendo-tilelayout class="costumize_full_grid"
+  [resizable]="editMode"
+  [rowHeight]="'282px'"
+  [columns]="7"
+  [autoFlow]="'row'">
+  <kendo-tilelayout-item class="costumize_full_grid"
+    [rowSpan]="2"
+    [colSpan]="7">
+    <kendo-tilelayout-item-header>
+      {{ 'Adhésions Actives'.toUpperCase() }}
+    </kendo-tilelayout-item-header>
+    <kendo-tilelayout-item-body kendoRippleContainer>
+      @if (editMode) {
+      <button
+        kendoButton
+        style="position: absolute; top: 8px; right: 16px; z-index: 10"
+        [iconClass]="hide[0].getValue() ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"
+        (click)="hide[0].next(!hide[0].getValue())">
+        {{ hide[0].getValue() ? 'Afficher' : 'Masquer' }}
+      </button>
+      }
+      <kendo-grid
+        [pageable]="true"
+        #pageGrid
+        [data]="adhesionActiveService | async"
+        [pageSize]="adhesionActiveService.state.take"
+        [skip]="adhesionActiveService.state.skip"
+        [sort]="adhesionActiveService.state.sort"
+        [groupable]="false"
+        portalsGridPersistance
+        [scrollable]="'scrollable'"
+        [resizable]="true"
+        (dataStateChange)="dataStateChangeAdhesionsActives($event)"
+        [loading]="adhesionActiveService.isLoading"
+        class="h-full">
+        <ng-template kendoGridToolbarTemplate>
+          <kendo-grid-column-chooser></kendo-grid-column-chooser>
+          @if(hasAccess()){
+          <button
+            (click)="exportAdhesionsActives()"
+            class="k-button"
+            [svgIcon]="fileExcelIcon"
+            [disabled]="(isExporting | async) ?? false"
+            kendoGridExcelCommand
+            type="button">
+            Exporter
+          </button>
+          }
+        </ng-template>
+        <kendo-grid-column
+          [field]="'souscripteur'"
+          [title]="'Souscripteur'"
+          [width]="125"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'police'"
+          [title]="'Police'"
+          [width]="125"></kendo-grid-column>
+        <kendo-grid-column
+          [title]="'Nom & Prénom'"
+          [field]="'nom'"
+          [width]="100">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            <div class="m-l-15">
+              <p class="font-medium m-b-0 m-t-0">{{ dataItem.nom }} {{ dataItem.prenom }}</p>
+              <small class="text-muted"> {{ dataItem.numAdhesion }} / {{ dataItem.matricule }}</small>
+            </div>
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'dateNaissance'"
+          [title]="'Date Naissance'"
+          [width]="125">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateNaissance | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'lien'"
+          [title]="'Lien'"
+          [width]="110">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem>
+            @switch (dataItem.lien) { @case ('Adherent') {
+            <kendo-chip class="middle-blue-chip">Adhérent</kendo-chip>
+            } @case ("Conjoint") {
+            <kendo-chip class="heliotrope-chip">{{ dataItem.lien }}</kendo-chip>
+            } @case ("Enfant") {
+            <kendo-chip class="amethyst-chip">{{ dataItem.lien }}</kendo-chip>
+            } @default {
+            <kendo-chip [fillMode]="'outline'">{{ dataItem.lien || 'N/A' }}</kendo-chip>
+            } }
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'cin'"
+          [title]="'CIN'"
+          [width]="125"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'dateAdhesion'"
+          [title]="'Date Adhésion'"
+          [width]="125">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateAdhesion | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'sexe'"
+          [title]="'Sexe'"
+          [width]="100">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            @switch (dataItem.sexe) { @case ('Homme') {
+            <kendo-chip class="middle-blue-chip">{{ dataItem.sexe }}</kendo-chip>
+            } @case ("Femme") {
+            <kendo-chip class="heliotrope-chip">{{ dataItem.sexe }}</kendo-chip>
+            } @default {
+            <kendo-chip [fillMode]="'outline'">{{ dataItem.sexe || 'N/A' }}</kendo-chip>
+            } }
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'rib'"
+          [title]="'RIB'"
+          [width]="125"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'estHandicape'"
+          [title]="'Mobilité Restreinte'"
+          [width]="125">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem>
+            @if (dataItem?.estHandicape) {
+            <kendo-chip class="palm-prings-chip">Oui</kendo-chip>
+            } @else {
+            <kendo-chip class="alizarin-chip">Non</kendo-chip>
+            }
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'age'"
+          [title]="'ÂGE'"
+          [width]="75"></kendo-grid-column>
+      </kendo-grid>
+    </kendo-tilelayout-item-body>
+  </kendo-tilelayout-item>
+</kendo-tilelayout>

@@ -1,0 +1,21 @@
+﻿@if (field != null) {
+  <div class="flex w-full flex-col gap-1">
+    <span class="text-xs font-medium text-slate-600">{{ field.placeholder }}</span>
+    @if (field.name === dashboardFields.Souscripteur) {
+      <portals-souscripteur-active-multiselect class="w-full" [formControl]="field.formField()"></portals-souscripteur-active-multiselect>
+    } @else {
+      <kendo-multiselect
+        class="w-full"
+        [formControl]="field.formField()"
+        [placeholder]="field.placeholder"
+        [data]="field.data"
+        [filterable]="true"
+        [loading]="field.isLoading"
+        (filterChange)="field.keyword.next($event)">
+      </kendo-multiselect>
+    }
+  </div>
+}
+@if (field == null) {
+  <div class="text-xs text-red-700">Champ non configuré</div>
+}

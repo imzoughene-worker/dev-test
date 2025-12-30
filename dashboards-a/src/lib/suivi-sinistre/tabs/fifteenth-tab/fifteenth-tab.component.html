@@ -1,0 +1,518 @@
+﻿<kendo-tilelayout
+  class="min-h-[80vh]"
+  [resizable]="editMode"
+  [reorderable]="editMode"
+  [rowHeight]="'282px'"
+  [columns]="7"
+  [autoFlow]="'row'">
+  @if (editMode || hide[0].getValue() === false) {
+  <kendo-tilelayout-item [colSpan]="2">
+    @if ({ text: 'TOTAL DOSSIER AMBULATOIRE' }; as header) {
+    <kendo-tilelayout-item-header class="flex justify-between items-center">
+      {{ header.text }}
+      @if (!editMode) {
+      <button
+        kendoButton
+        [svgIcon]="fullscreenIcon"
+        (click)="expandCard(graph1.dataContainer!, header.text)"></button>
+      }
+    </kendo-tilelayout-item-header>
+    }
+    <kendo-tilelayout-item-body>
+      @if (editMode) {
+      <button
+        kendoButton
+        style="position: absolute; top: 8px; right: 16px; z-index: 10"
+        [svgIcon]="hide[0].getValue() ? eyeIcon : eyeSlashIcon"
+        (click)="hide[0].next(!hide[0].getValue())">
+        {{ hide[0].getValue() ? 'Afficher' : 'Masquer' }}
+      </button>
+      }
+      <portals-metric-chart
+        #graph1
+        [data]="totalDossierAmbulatoireMetric"
+        [isLoading]="totalDossierAmbulatoireIsLoading"></portals-metric-chart>
+    </kendo-tilelayout-item-body>
+  </kendo-tilelayout-item>
+  } @if (editMode || hide[1].getValue() === false) {
+  <kendo-tilelayout-item [colSpan]="2">
+    @if ({ text: 'TOTAL DES DÉPÔTS PEC' }; as header) {
+    <kendo-tilelayout-item-header class="flex justify-between items-center">
+      {{ header.text }}
+      @if (!editMode) {
+      <button
+        kendoButton
+        [svgIcon]="fullscreenIcon"
+        (click)="expandCard(graph2.dataContainer!, header.text)"></button>
+      }
+    </kendo-tilelayout-item-header>
+    }
+    <kendo-tilelayout-item-body>
+      @if (editMode) {
+      <button
+        kendoButton
+        style="position: absolute; top: 8px; right: 16px; z-index: 10"
+        [svgIcon]="hide[1].getValue() ? eyeIcon : eyeSlashIcon"
+        (click)="hide[1].next(!hide[1].getValue())">
+        {{ hide[1].getValue() ? 'Afficher' : 'Masquer' }}
+      </button>
+      }
+      <portals-metric-chart
+        #graph2
+        [data]="totalPECMetric"
+        [isLoading]="totalPECIsLoading"></portals-metric-chart>
+    </kendo-tilelayout-item-body>
+  </kendo-tilelayout-item>
+  } @if (editMode || hide[2].getValue() === false) {
+  <kendo-tilelayout-item [colSpan]="3">
+    @if ({ text: 'TOTAL DES EXÉCUTIONS AP' }; as header) {
+    <kendo-tilelayout-item-header class="flex justify-between items-center">
+      {{ header.text }}
+      @if (!editMode) {
+      <button
+        kendoButton
+        [svgIcon]="fullscreenIcon"
+        (click)="expandCard(graph3.dataContainer!, header.text)"></button>
+      }
+    </kendo-tilelayout-item-header>
+    }
+    <kendo-tilelayout-item-body>
+      @if (editMode) {
+      <button
+        kendoButton
+        style="position: absolute; top: 8px; right: 16px; z-index: 10"
+        [svgIcon]="hide[2].getValue() ? eyeIcon : eyeSlashIcon"
+        (click)="hide[2].next(!hide[2].getValue())">
+        {{ hide[2].getValue() ? 'Afficher' : 'Masquer' }}
+      </button>
+      }
+      <portals-metric-chart
+        #graph3
+        [data]="TotalExecutionAPMetric"
+        [isLoading]="TotalExecutionAPIsLoading"></portals-metric-chart>
+    </kendo-tilelayout-item-body>
+  </kendo-tilelayout-item>
+  } @if (editMode || hide[3].getValue() === false) {
+  <kendo-tilelayout-item
+    [colSpan]="7"
+    [rowSpan]="2">
+    @if ({ text: 'SUIVI DE TOUS LES SINISTRES EN COURS' }; as header) {
+    <kendo-tilelayout-item-header class="flex justify-between items-center">
+      {{ header.text }}
+    </kendo-tilelayout-item-header>
+    }
+    <kendo-tilelayout-item-body>
+      @if (editMode) {
+      <button
+        kendoButton
+        style="position: absolute; top: 8px; right: 16px; z-index: 10"
+        [svgIcon]="hide[3].getValue() ? eyeIcon : eyeSlashIcon"
+        (click)="hide[3].next(!hide[3].getValue())">
+        {{ hide[3].getValue() ? 'Afficher' : 'Masquer' }}
+      </button>
+      }
+      <kendo-grid
+        portalsGridPersistance
+        #pageGrid
+        class="h-full"
+        [data]="sinistreEnCoursService | async"
+        [pageSize]="sinistreEnCoursService.state.take"
+        [skip]="sinistreEnCoursService.state.skip"
+        [sort]="sinistreEnCoursService.state.sort"
+        [groupable]="false"
+        [pageable]="true"
+        [scrollable]="'scrollable'"
+        [resizable]="true"
+        (dataStateChange)="dataStateChangeSuiviTousLesSinistreEnCours($event)"
+        [loading]="sinistreEnCoursService.isLoading">
+        <ng-template kendoGridToolbarTemplate>
+          <kendo-grid-column-chooser></kendo-grid-column-chooser>
+          @if(hasAccess()){
+          <button
+            (click)="exportSinistreEnCours()"
+            class="k-button"
+            [svgIcon]="fileExcelIcon"
+            [disabled]="(isExporting | async) ?? false"
+            kendoGridExcelCommand
+            type="button">
+            Exporter
+          </button>
+          }
+        </ng-template>
+        <kendo-grid-column
+          [field]="'dateLot'"
+          [title]="'Date de réception Souscripteur'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateLot | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'souscripteur'"
+          [title]="'Souscripteur'"
+          [width]="125"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'numeroDeclaration'"
+          [title]="'Num. Dossier'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'typeDossier'"
+          [title]="'Type Dossier'"
+          [sortable]="false"
+          [filterable]="false"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-item>
+            @switch (item.typeDossier) { @case ('Dépot dossier') {
+            <kendo-chip
+              class="pink-glamor-chip"
+              [label]="'Dépôt de dossier'"></kendo-chip>
+            } @case ('Contestation rejet') {
+            <kendo-chip
+              class="soaring-eagle-chip"
+              [label]="'Contestation de rejet'"></kendo-chip>
+            } @case ('Dépot complement d\'information') {
+            <kendo-chip
+              class="june-bud-chip"
+              label="Dépôt de complément d'information"></kendo-chip>
+            } @case ('Dépot rapport contre visite') {
+            <kendo-chip
+              class="flower-chip"
+              label="Dépôt de rapport contre-visite"></kendo-chip>
+            } @case ('Dépot demande de P.E.C') {
+            <kendo-chip
+              class="amethyst-chip"
+              label="Dépôt de demande de P.E.C"></kendo-chip>
+            } @case ('Dépot complement conjoint') {
+            <kendo-chip
+              class="deep-cove-chip"
+              label="Dépôt de complément conjoint"></kendo-chip>
+            } @case ('Accord préalable Execution') {
+            <kendo-chip
+              class="alizarin-chip"
+              label="Accord préalable d'exécution"></kendo-chip>
+            } @case ('Dépot correctif') {
+            <kendo-chip
+              class="palm-prings-chip"
+              label="Dépôt correctif"></kendo-chip>
+            } @case ('Dépot Tiers-Payant') {
+            <kendo-chip
+              class="asphalt-chip"
+              label="Dépôt Tiers-Payant"></kendo-chip>
+            } @default {
+            <kendo-chip [label]="item.typeDossier"></kendo-chip>
+            } }
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'numAdhesion'"
+          [title]="'Num.Adhésion'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'nomAdhesion'"
+          [title]="'Adhérent'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'dateVisite'"
+          [title]="'Date de Visite'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateVisite | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'nomBeneficiaire'"
+          [title]="'Bénéficiaire'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'lienBeneficiaire'"
+          [title]="'Lien Bénéficiaire'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'numeroLot'"
+          [title]="'Num. Lot'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          field="modeIndemnisation"
+          title="Mode d'indemnisation"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-item>
+            @switch (item.modeIndemnisation) { @case ('CartePrepayee') {
+            <kendo-chip
+              class="pink-glamor-chip"
+              label="Carte Prépayée"></kendo-chip>
+            } @case ('Cheque') {
+            <kendo-chip
+              class="soaring-eagle-chip"
+              label="Chéque"></kendo-chip>
+            } @case ('Espece') {
+            <kendo-chip
+              class="june-bud-chip"
+              label="Espèce"></kendo-chip>
+            } @case ('Virement') {
+            <kendo-chip
+              class="flower-chip"
+              label="Virement"></kendo-chip>
+            } @case ('MiseDisposition') {
+            <kendo-chip
+              class="amethyst-chip"
+              label="Mise à disposition"></kendo-chip>
+            } @default {
+            <kendo-chip
+              themeColor="error"
+              label="{{ item.modeIndemnisation || 'N/A' }}"></kendo-chip>
+            } }
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          field="destinataireIndemnisation"
+          title="Destinataire d'indemnisation"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-item>
+            @switch (item.destinataireIndemnisation) { @case ("Adherent") {
+            <kendo-chip
+              class="amethyst-chip"
+              label="{{ item.destinataireIndemnisation }}"></kendo-chip>
+            } @case ("Contractant") {
+            <kendo-chip
+              class="asphalt-chip"
+              label="{{ item.destinataireIndemnisation }}"></kendo-chip>
+            } @case ("Intermediaire") {
+            <kendo-chip
+              class="flower-chip"
+              label="{{ item.destinataireIndemnisation }}"></kendo-chip>
+            } @case ("Prestataire") {
+            <kendo-chip
+              class="carrot-chip"
+              label="{{ item.destinataireIndemnisation }}"></kendo-chip>
+            } @default {
+            <kendo-chip label="{{ item.destinataireIndemnisation || 'N/A' }}"></kendo-chip>
+            } }
+          </ng-template>
+        </kendo-grid-column>
+      </kendo-grid>
+    </kendo-tilelayout-item-body>
+  </kendo-tilelayout-item>
+  } @if (editMode || hide[4].getValue() === false) {
+  <kendo-tilelayout-item
+    [colSpan]="7"
+    [rowSpan]="2">
+    @if ({ text: 'TABLE SUIVI SINISTRE LIQUIDE' }; as header) {
+    <kendo-tilelayout-item-header class="flex justify-between items-center">
+      {{ header.text }}
+    </kendo-tilelayout-item-header>
+    }
+    <kendo-tilelayout-item-body>
+      @if (editMode) {
+      <button
+        kendoButton
+        style="position: absolute; top: 8px; right: 16px; z-index: 10"
+        [svgIcon]="hide[4].getValue() ? eyeIcon : eyeSlashIcon"
+        (click)="hide[4].next(!hide[4].getValue())">
+        {{ hide[4].getValue() ? 'Afficher' : 'Masquer' }}
+      </button>
+      }
+      <kendo-grid
+        portalsGridPersistance
+        #pageGrid
+        class="h-full"
+        [data]="sinistreLiquideService | async"
+        [pageSize]="sinistreLiquideService.state.take"
+        [skip]="sinistreLiquideService.state.skip"
+        [sort]="sinistreLiquideService.state.sort"
+        [groupable]="false"
+        [pageable]="true"
+        [scrollable]="'scrollable'"
+        [resizable]="true"
+        (dataStateChange)="dataStateChangeSuiviSinistreLiquide($event)"
+        [loading]="sinistreLiquideService.isLoading">
+        <ng-template kendoGridToolbarTemplate>
+          <kendo-grid-column-chooser></kendo-grid-column-chooser>
+          @if(hasAccess()){
+          <button
+            (click)="exportSinistreLiquide()"
+            class="k-button"
+            [svgIcon]="fileExcelIcon"
+            [disabled]="(isExporting2 | async) ?? false"
+            kendoGridExcelCommand
+            type="button">
+            Exporter
+          </button>
+          }
+        </ng-template>
+        <kendo-grid-column
+          [field]="'dateLot'"
+          [title]="'Date de réception Souscripteur'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateLot | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'souscripteur'"
+          [title]="'Souscripteur'"
+          [width]="125"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'numeroDeclaration'"
+          [title]="'Num. Dossier'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'numAdhesion'"
+          [title]="'Num.Adhésion'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'nomAdhesion'"
+          [title]="'Adhérent'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'dateVisite'"
+          [title]="'Date de Visite'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateVisite | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'nomBeneficiaire'"
+          [title]="'Bénéficiaire'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'lienBeneficiaire'"
+          [title]="'Lien Bénéficiaire'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'numeroLot'"
+          [title]="'Num. Lot'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'dateRemboursement'"
+          [title]="'Date Remboursement'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateRemboursement | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'delaiTraitement'"
+          [title]="'Delai Traitement'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem>
+            <kendo-chip
+              [themeColor]="checkDelaiTraitement(dataItem.delaiTraitementString)"
+              (click)="openDialog(dataItem)"
+              [svgIcon]="menuIcon"
+              [title]="'Afficher l\'Historique par Version'">
+              {{ dataItem.delaiTraitementString ?? 0 }}
+            </kendo-chip>
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'tauxRemboursment'"
+          [title]="'Taux Remboursement'"
+          [format]="'{c:2}'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          field="modeIndemnisation"
+          title="Mode d'indemnisation"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-item>
+            @switch (item.modeIndemnisation) { @case ('CartePrepayee') {
+            <kendo-chip
+              class="pink-glamor-chip"
+              label="Carte Prépayée"></kendo-chip>
+            } @case ('Cheque') {
+            <kendo-chip
+              class="soaring-eagle-chip"
+              label="Chéque"></kendo-chip>
+            } @case ('Espece') {
+            <kendo-chip
+              class="june-bud-chip"
+              label="Espèce"></kendo-chip>
+            } @case ('Virement') {
+            <kendo-chip
+              class="flower-chip"
+              label="Virement"></kendo-chip>
+            } @case ('MiseDisposition') {
+            <kendo-chip
+              class="amethyst-chip"
+              label="Mise à disposition"></kendo-chip>
+            } @default {
+            <kendo-chip
+              themeColor="error"
+              label="{{ item.modeIndemnisation || 'N/A' }}"></kendo-chip>
+            } }
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          field="destinataireIndemnisation"
+          title="Destinataire d'indemnisation"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-item>
+            @switch (item.destinataireIndemnisation) { @case ("Adherent") {
+            <kendo-chip
+              class="amethyst-chip"
+              label="{{ item.destinataireIndemnisation }}"></kendo-chip>
+            } @case ("Contractant") {
+            <kendo-chip
+              class="asphalt-chip"
+              label="{{ item.destinataireIndemnisation }}"></kendo-chip>
+            } @case ("Intermediaire") {
+            <kendo-chip
+              class="flower-chip"
+              label="{{ item.destinataireIndemnisation }}"></kendo-chip>
+            } @case ("Prestataire") {
+            <kendo-chip
+              class="carrot-chip"
+              label="{{ item.destinataireIndemnisation }}"></kendo-chip>
+            } @default {
+            <kendo-chip label="{{ item.destinataireIndemnisation || 'N/A' }}"></kendo-chip>
+            } }
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'fraisEngage'"
+          [title]="'Montant Engagé'"
+          [width]="150">
+          <ng-template kendoGridFooterTemplate>
+            Total : {{ sinistreLiquideService.getAggregate('sumMontantEngage', '0 DHS') | kendoNumber: 'c2' }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'montantRembourse'"
+          [title]="'Montant Remboursé'"
+          [width]="150">
+          <ng-template kendoGridFooterTemplate>
+            Total : {{ sinistreLiquideService.getAggregate('sumMontantRembourse', '0 DHS') | kendoNumber: 'c2' }}
+          </ng-template>
+        </kendo-grid-column>
+      </kendo-grid>
+    </kendo-tilelayout-item-body>
+  </kendo-tilelayout-item>
+  }
+</kendo-tilelayout>

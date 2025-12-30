@@ -1,0 +1,113 @@
+﻿<kendo-tilelayout
+  class="min-h-[80vh]"
+  [resizable]="editMode"
+  [reorderable]="editMode"
+  [rowHeight]="'282px'"
+  [columns]="7"
+  [autoFlow]="'row'">
+  @if (editMode || hide[0].getValue() === false) {
+    <kendo-tilelayout-item
+      [colSpan]="3"
+      [rowSpan]="2">
+      @if ({ text: 'RÉPARTITION PAR GENRE'.toUpperCase() }; as header) {
+        <kendo-tilelayout-item-header
+          class="flex justify-between items-center">
+          {{ header.text }}
+          @if (!editMode) {
+            <button
+              kendoButton
+              [svgIcon]="fullscreenIcon"
+            (click)="expandCard(graph1.dataContainer!, header.text)"></button>
+          }
+        </kendo-tilelayout-item-header>
+      }
+      <kendo-tilelayout-item-body>
+        @if (editMode) {
+          <button
+            kendoButton
+            style="position: absolute; top: 8px; right: 16px; z-index: 10"
+            [iconClass]="hide[0].getValue() ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"
+            (click)="hide[0].next(!hide[0].getValue())"
+            >
+            {{ hide[0].getValue() ? 'Afficher' : 'Masquer' }}
+          </button>
+        }
+        <portals-pie-chart
+          #graph1
+          class=""
+          [data]="repartitionParSexePieChart"
+        [isLoading]="repartitionParSexeIsLoading"></portals-pie-chart>
+      </kendo-tilelayout-item-body>
+    </kendo-tilelayout-item>
+  }
+  @if (editMode || hide[1].getValue() === false) {
+    <kendo-tilelayout-item
+      [colSpan]="4"
+      [rowSpan]="2">
+      @if ({ text: 'RÉPARTITION​ POPULATION PAR MAJEUR MINEUR' }; as header) {
+        <kendo-tilelayout-item-header
+          class="flex justify-between items-center">
+          {{ header.text }}
+          @if (!editMode) {
+            <button
+              kendoButton
+              [svgIcon]="fullscreenIcon"
+            (click)="expandCard(graph2.dataContainer!, header.text)"></button>
+          }
+        </kendo-tilelayout-item-header>
+      }
+      <kendo-tilelayout-item-body>
+        @if (editMode) {
+          <button
+            kendoButton
+            style="position: absolute; top: 8px; right: 16px; z-index: 10"
+            [iconClass]="hide[1].getValue() ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"
+            (click)="hide[1].next(!hide[1].getValue())"
+            >
+            {{ hide[1].getValue() ? 'Afficher' : 'Masquer' }}
+          </button>
+        }
+        <portals-pie-chart
+          class=""
+          #graph2
+          [data]="repartitionPopulationMajeurMineurPieChart"
+          [isLoading]="repartitionPopulationMajeurMineurIsLoading"
+        title="RÉPARTITION​ POPULATION PAR MAJEUR MINEUR"></portals-pie-chart>
+      </kendo-tilelayout-item-body>
+    </kendo-tilelayout-item>
+  }
+  @if (editMode || hide[2].getValue() === false) {
+    <kendo-tilelayout-item
+      [colSpan]="7"
+      [rowSpan]="2">
+      @if ({ text: ' Nombres adhérents par police et catégorie'.toUpperCase() }; as header) {
+        <kendo-tilelayout-item-header
+          class="flex justify-between items-center">
+          {{ header.text }}
+          @if (!editMode) {
+            <button
+              kendoButton
+              [svgIcon]="fullscreenIcon"
+            (click)="expandCard(graph3.dataContainer!, header.text)"></button>
+          }
+        </kendo-tilelayout-item-header>
+      }
+      <kendo-tilelayout-item-body>
+        @if (editMode) {
+          <button
+            kendoButton
+            style="position: absolute; top: 8px; right: 16px; z-index: 10"
+            [iconClass]="hide[2].getValue() ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"
+            (click)="hide[2].next(!hide[2].getValue())"
+            >
+            {{ hide[2].getValue() ? 'Afficher' : 'Masquer' }}
+          </button>
+        }
+        <portals-multigraph-chart
+          #graph3
+          [data]="nombreLienParPoliceMultiGraph"
+        [isLoading]="nombreLienParPoliceIsLoading"></portals-multigraph-chart>
+      </kendo-tilelayout-item-body>
+    </kendo-tilelayout-item>
+  }
+</kendo-tilelayout>

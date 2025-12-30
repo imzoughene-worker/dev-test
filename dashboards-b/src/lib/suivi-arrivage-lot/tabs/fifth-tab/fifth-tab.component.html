@@ -1,0 +1,139 @@
+﻿<kendo-tilelayout
+  class="min-h-[80vh]"
+  [resizable]="editMode"
+  [reorderable]="editMode"
+  [rowHeight]="'282px'"
+  [columns]="12"
+  [autoFlow]="'row'">
+  <kendo-tilelayout-item [colSpan]="6">
+    @if ({ text: 'TOTAL DES DOSSIERS REÇUS' }; as header) {
+      <kendo-tilelayout-item-header
+        class="flex justify-between items-center">
+        {{ header.text }}
+        @if (!editMode) {
+          <button
+            kendoButton
+            [svgIcon]="fullscreenIcon"
+          (click)="expandCard(graph1.dataContainer!, header.text)"></button>
+        }
+      </kendo-tilelayout-item-header>
+    }
+    <kendo-tilelayout-item-body>
+      @if (editMode) {
+        <button
+          kendoButton
+          style="position: absolute; top: 8px; right: 16px; z-index: 10"
+          [iconClass]="hide[0].getValue() ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"
+          (click)="hide[0].next(!hide[0].getValue())"
+          >
+          {{ hide[0].getValue() ? 'Afficher' : 'Masquer' }}
+        </button>
+      }
+      <portals-metric-chart
+        #graph1
+        [data]="totalDossierRecuMetric"
+      [isLoading]="totalDossierRecuIsLoading"></portals-metric-chart>
+    </kendo-tilelayout-item-body>
+  </kendo-tilelayout-item>
+  <kendo-tilelayout-item [colSpan]="6">
+    @if ({ text: 'TOTAL PEC REÇUS' }; as header) {
+      <kendo-tilelayout-item-header
+        class="flex justify-between items-center">
+        {{ header.text }}
+        @if (!editMode) {
+          <button
+            kendoButton
+            [svgIcon]="fullscreenIcon"
+          (click)="expandCard(graph2.dataContainer!, header.text)"></button>
+        }
+      </kendo-tilelayout-item-header>
+    }
+    <kendo-tilelayout-item-body>
+      @if (editMode) {
+        <button
+          kendoButton
+          style="position: absolute; top: 8px; right: 16px; z-index: 10"
+          [iconClass]="hide[1].getValue() ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"
+          (click)="hide[1].next(!hide[1].getValue())"
+          >
+          {{ hide[1].getValue() ? 'Afficher' : 'Masquer' }}
+        </button>
+      }
+      <portals-metric-chart
+        #graph2
+        [data]="totalPECRecuMetric"
+      [isLoading]="totalPECRecuIsLoading"></portals-metric-chart>
+    </kendo-tilelayout-item-body>
+  </kendo-tilelayout-item>
+  @if (nombreDossierParJourLine; as apc) {
+    <kendo-tilelayout-item
+      [colSpan]="12"
+      [rowSpan]="2">
+      <kendo-tilelayout-item-header>
+        {{ apc.title }}
+      </kendo-tilelayout-item-header>
+      <kendo-tilelayout-item-body>
+        @if (editMode) {
+          <button
+            kendoButton
+            style="position: absolute; top: 8px; right: 16px; z-index: 10"
+            [iconClass]="hide[3].getValue() ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"
+            (click)="hide[3].next(!hide[3].getValue())"
+            >
+            {{ hide[3].getValue() ? 'Afficher' : 'Masquer' }}
+          </button>
+        }
+        @if (nombreDossierParJourIsLoading) {
+          <kendo-progressbar
+            [indeterminate]="true"
+          ></kendo-progressbar>
+        }
+        @if (!nombreDossierParJourIsLoading) {
+          <div
+            class="w-full h-full"
+            >
+            <kendo-chart
+              class="h-full"
+              renderAs="canvas"
+              [pannable]="{ lock: 'y' }"
+              [zoomable]="{ mousewheel: { lock: 'y' } }">
+              <kendo-chart-category-axis>
+                <kendo-chart-category-axis-item
+                  [labels]="{ rotation: 'auto' }"
+                  [categories]="apc.categories"
+                  [title]="{ text: apc.categoryName }">
+                  <kendo-chart-category-axis-item-crosshair>
+                    <kendo-chart-category-axis-item-crosshair-tooltip></kendo-chart-category-axis-item-crosshair-tooltip>
+                  </kendo-chart-category-axis-item-crosshair>
+                </kendo-chart-category-axis-item>
+              </kendo-chart-category-axis>
+              <kendo-chart-value-axis>
+                <kendo-chart-value-axis-item
+                [crosshair]="{ visible: true, tooltip: { visible: true, format: '#.##' } }"></kendo-chart-value-axis-item>
+              </kendo-chart-value-axis>
+              <kendo-chart-series>
+                @for (serie of apc.series; track serie) {
+                  <kendo-chart-series-item
+                    type="line"
+                    [data]="serie.data"
+                    [name]="serie.title">
+                    <kendo-chart-series-item-tooltip>
+                      <ng-template
+                        let-value="value"
+                        let-category="category">
+                        {{ serie.title }} ({{ value }}) Le {{ category }}
+                      </ng-template>
+                    </kendo-chart-series-item-tooltip>
+                  </kendo-chart-series-item>
+                }
+              </kendo-chart-series>
+              <kendo-chart-legend
+                position="bottom"
+              orientation="horizontal"></kendo-chart-legend>
+            </kendo-chart>
+          </div>
+        }
+      </kendo-tilelayout-item-body>
+    </kendo-tilelayout-item>
+  }
+</kendo-tilelayout>

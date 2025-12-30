@@ -1,0 +1,201 @@
+﻿<kendo-tilelayout class="costumize_full_grid"
+  [resizable]="editMode"
+  [reorderable]="editMode"
+  [rowHeight]="'94px'"
+  [columns]="7"
+  [autoFlow]="'row'">
+  <kendo-tilelayout-item class="costumize_full_grid"
+    [rowSpan]="6"
+    [colSpan]="7">
+    @if ({ text: 'DÉTAIL DES DOSSIERS' }; as header) {
+    <kendo-tilelayout-item-header class="flex justify-between items-center">
+      {{ header.text }}
+    </kendo-tilelayout-item-header>
+    }
+    <kendo-tilelayout-item-body>
+      @if (editMode) {
+      <button
+        kendoButton
+        style="position: absolute; top: 8px; right: 16px; z-index: 10"
+        [iconClass]="hide[0].getValue() ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"
+        (click)="hide[0].next(!hide[0].getValue())">
+        {{ hide[0].getValue() ? 'Afficher' : 'Masquer' }}
+      </button>
+      }
+      <kendo-grid
+        [resizable]="true"
+        #pageGrid
+        [data]="detailLotService | async"
+        [pageSize]="detailLotService.state.take"
+        [skip]="detailLotService.state.skip"
+        [sort]="detailLotService.state.sort"
+        [groupable]="false"
+        [pageable]="true"
+        [scrollable]="'scrollable'"
+        portalsGridPersistance
+        (dataStateChange)="dataStateChangeSuiviLots($event)"
+        [loading]="detailLotService.isLoading"
+        class="h-full">
+        <ng-template kendoGridToolbarTemplate>
+          <kendo-grid-column-chooser></kendo-grid-column-chooser>
+          @if(hasAccess()){
+          <button
+            (click)="exportDetailDossiers()"
+            class="k-button"
+            [svgIcon]="fileExcelIcon"
+            kendoGridExcelCommand
+            type="button">
+            Exporter
+          </button>
+          }
+        </ng-template>
+        @if (isExterne){
+        <ng-template
+          kendoGridDetailTemplate
+          let-item>
+          <portals-key-value title="Motif">
+            {{ item.motif || 'N/A' }}
+          </portals-key-value>
+        </ng-template>
+        }
+        <kendo-grid-column
+          [field]="'dateLot'"
+          [title]="'Date de réception Souscripteur'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateLot | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'souscripteur'"
+          [title]="'Souscripteur'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'police'"
+          [title]="'Nª Police'"
+          [width]="150"></kendo-grid-column>
+        @if(isExterne === false){ @if(appModeService.appMode()?.isCourtierMode){
+        <kendo-grid-column
+          [field]="'dateDepotCourrier'"
+          [title]="'Date Envoie Cie'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem>
+            {{ dataItem.dateDepotCourrier | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        }@else{
+        <kendo-grid-column
+          [field]="'dateSaisieTerminee'"
+          [title]="'Date fin de saisie'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem>
+            {{ dataItem.dateSaisieTerminee | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        } } @if(appModeService.appMode()?.isCourtierMode && isExterne === false){
+        <kendo-grid-column
+          [field]="'dateRetourCie'"
+          [title]="'Date Retour Cie'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateRetourCie | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        }
+        <kendo-grid-column
+          [field]="'numeroDeclaration'"
+          [title]="'Num. Dossier'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'typeDossier'"
+          [title]="'Type Dossier'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'numAdhesion'"
+          [title]="'Num.Adhésion'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'nomAdhesion'"
+          [title]="'Adhérent'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'dateVisite'"
+          [title]="'Date de Visite'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateVisite | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column
+          [field]="'dateRemboursement'"
+          [title]="'Date Remb.'"
+          [width]="150">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateRemboursement | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+
+        <kendo-grid-column
+          [field]="'nomBeneficiaire'"
+          [title]="'Bénéficiaire'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'lienBeneficiaire'"
+          [title]="'Lien Bénéficiaire'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'numeroLot'"
+          [title]="'Num. Lot'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'firstTag'"
+          [title]="'First Tag'"
+          [width]="150"></kendo-grid-column>
+        @if (isExterne == false) {
+        <kendo-grid-column
+          [field]="'thirdTag'"
+          [title]="'Third Tag'"
+          [width]="150"></kendo-grid-column>
+        } @if (isExterne && appModeService.appMode()?.isCourtierMode) {
+        <kendo-grid-column
+          [field]="'etatClientExtranet'"
+          [title]="'Etat DM'"
+          [width]="150"></kendo-grid-column>
+        } @else {
+        <kendo-grid-column
+          [field]="'etat'"
+          [title]="'Etat'"
+          [width]="150"></kendo-grid-column>
+        }
+        <kendo-grid-column
+          [field]="'typeRetour'"
+          [title]="appModeService.appMode()?.isCourtierMode ? 'Type Retour Cie' : 'Type correspondance'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'fraisEngage'"
+          [title]="'Frais Engagé'"
+          [width]="150"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'montantRembourse'"
+          [title]="'Montant Remboursé'"
+          [width]="150"></kendo-grid-column>
+      </kendo-grid>
+    </kendo-tilelayout-item-body>
+  </kendo-tilelayout-item>
+</kendo-tilelayout>

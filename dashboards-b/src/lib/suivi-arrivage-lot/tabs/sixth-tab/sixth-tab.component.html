@@ -1,0 +1,134 @@
+﻿<kendo-tilelayout class="costumize_full_grid"
+  [resizable]="editMode"
+  [reorderable]="editMode"
+  [rowHeight]="'282px'"
+  [columns]="7"
+  [autoFlow]="'row'">
+  <kendo-tilelayout-item class="costumize_full_grid"
+    [colSpan]="7"
+    [rowSpan]="2">
+    <kendo-tilelayout-item-header> DETAIL SUIVI LOT</kendo-tilelayout-item-header>
+    <kendo-tilelayout-item-body>
+      @if (editMode) {
+      <button
+        kendoButton
+        style="position: absolute; top: 8px; right: 16px; z-index: 10"
+        [iconClass]="hide[0].getValue() ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"
+        (click)="hide[0].next(!hide[0].getValue())">
+        {{ hide[0].getValue() ? 'Afficher' : 'Masquer' }}
+      </button>
+      }
+      <kendo-grid
+        [scrollable]="'scrollable'"
+        #pageGrid
+        [data]="suiviArrivageLotService | async"
+        [pageSize]="suiviArrivageLotService.state.take"
+        [skip]="suiviArrivageLotService.state.skip"
+        [sort]="suiviArrivageLotService.state.sort"
+        [groupable]="false"
+        [pageable]="true"
+        portalsGridPersistance
+        [resizable]="true"
+        (dataStateChange)="dataStateChangeSuiviArrivageLots($event)"
+        [loading]="suiviArrivageLotService.isLoading"
+        class="h-full">
+        <ng-template kendoGridToolbarTemplate>
+          <kendo-grid-column-chooser></kendo-grid-column-chooser>
+          @if(hasAccess()){
+          <button
+            (click)="exportDetailSuiviLot()"
+            class="k-button"
+            [svgIcon]="fileExcelIcon"
+            [disabled]="(isExporting | async) ?? false"
+            kendoGridExcelCommand
+            type="button">
+            Exporter
+          </button>
+          }
+        </ng-template>
+        <kendo-grid-column
+          [field]="'souscripteur'"
+          [title]="'Souscripteur'"
+          [width]="125"></kendo-grid-column>
+        <kendo-grid-column
+          [field]="'dateCreation'"
+          [title]="'Date'"
+          [width]="100">
+          <ng-template
+            kendoGridCellTemplate
+            let-dataItem
+            let-rowIndex="rowIndex">
+            {{ dataItem.dateCreation | dateLong }}
+          </ng-template>
+        </kendo-grid-column>
+        @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'bureauOrdre'"
+          [title]="'Bureau Ordre'"
+          [width]="125"></kendo-grid-column>
+        }
+        <kendo-grid-column
+          [field]="'numeroLot'"
+          [title]="'Num Lot'"
+          [width]="150"></kendo-grid-column>
+        @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'etat'"
+          [title]="'Etat'"
+          [width]="150"></kendo-grid-column>
+        } @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'totalDossierSaisie'"
+          [title]="'Total Saisie'"
+          [width]="125"></kendo-grid-column>
+        }
+        <kendo-grid-column
+          [field]="'totalDossierRecuEnAttenteDeSaisie'"
+          [title]="'Total Recu'"
+          [width]="125"></kendo-grid-column>
+
+        @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'ecartDossierDaisie'"
+          [title]="'Ecart'"
+          [width]="125"></kendo-grid-column>
+        } @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'depotDossierSaisie'"
+          [title]="'Dm'"
+          [width]="75"></kendo-grid-column>
+        } @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'depotRapportContreVisiteSaisie'"
+          [title]="'C.V'"
+          [width]="75"></kendo-grid-column>
+        } @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'depotBulletinAdhesionSaisie'"
+          [title]="'B.A'"
+          [width]="75"></kendo-grid-column>
+        } @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'depotComplementInformationSaisie'"
+          [title]="'C.I'"
+          [width]="75"></kendo-grid-column>
+        } @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'depotPriseEnChargeSaisie'"
+          [title]="'PEC'"
+          [width]="75"></kendo-grid-column>
+        } @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'depotBulletinSouscripteurSaisie'"
+          [title]="'B.S'"
+          [width]="75"></kendo-grid-column>
+        } @if (isInterne || appMode()?.isCompanyMode) {
+        <kendo-grid-column
+          [field]="'depotComplementConjointSaisie'"
+          [title]="'C.C'"
+          [width]="75"></kendo-grid-column>
+        }
+      </kendo-grid>
+    </kendo-tilelayout-item-body>
+  </kendo-tilelayout-item>
+</kendo-tilelayout>

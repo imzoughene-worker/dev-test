@@ -1,0 +1,144 @@
+<div class="grid grid-cols-1 gap-4">
+  <kendo-card width="100%">
+    <kendo-card-header class="flex justify-between items-center">
+      <h1
+        kendoCardTitle
+        class="m-0">
+        État 18
+      </h1>
+
+      <kendo-card-actions [layout]="'end'">
+        <button
+          kendoButton
+          [fillMode]="'outline'"
+          [themeColor]="'primary'"
+          (click)="handleGenerate()"
+          [svgIcon]="downloadIcon">
+          <!--          (click)="generateSubject.next(createForm.value)"-->
+          Télécharger
+        </button>
+      </kendo-card-actions>
+    </kendo-card-header>
+    <kendo-card-body class="grid grid-cols-1 gap-4">
+      <portals-global-errors [errors]="globalErrors()"></portals-global-errors>
+      <form
+        class="grid grid-cols-2 gap-4"
+        [formGroup]="createForm">
+        <kendo-formfield>
+          <kendo-label
+            [text]="'Souscripteurs'"
+            class="flex flex-col !w-full">
+            <kendo-multiselect
+              formControlName="souscripteurs"
+              [placeholder]="'Souscripteurs'"
+              [data]="(filteredSouscripteurs | async) ?? []"
+              [filterable]="true"
+              [loading]="filterLoading"
+              (filterChange)="souscripteurSubject.next($event)"
+              (valueChange)="policesSubject.next('')">
+            </kendo-multiselect>
+          </kendo-label>
+          <kendo-formerror>Souscripteur est requis</kendo-formerror>
+        </kendo-formfield>
+
+        <kendo-formfield>
+          @if ({ val: handlePolice | async }; as val) {
+          <kendo-label
+            [text]="'Polices'"
+            class="flex flex-col !w-full">
+            <kendo-multiselect
+              formControlName="polices"
+              [placeholder]="'Police'"
+              [data]="(filteredPolices | async) ?? []"
+              [filterable]="true"
+              [loading]="filterLoading"
+              (filterChange)="policesSubject.next($event)">
+            </kendo-multiselect>
+          </kendo-label>
+          }
+          <kendo-formerror>Police est requis</kendo-formerror>
+        </kendo-formfield>
+
+        <div class="col-span-2">
+          @if ({ val: dateRange$ | async }; as val) {
+          <kendo-daterange class="grid grid-cols-2 gap-4">
+            <kendo-label
+              [text]="'Date Début'"
+              class="flex flex-col !w-full">
+              <kendo-dateinput
+                class="!w-full"
+                kendoDateRangeStartInput
+                [value]="startDate$ | async"
+                (valueChange)="startDate$.next($event)"></kendo-dateinput>
+            </kendo-label>
+            <kendo-label
+              [text]="'Date Fin'"
+              class="flex flex-col !w-full">
+              <kendo-dateinput
+                class="!w-full"
+                kendoDateRangeEndInput
+                [value]="endDate$ | async"
+                (valueChange)="endDate$.next($event)"></kendo-dateinput>
+            </kendo-label>
+          </kendo-daterange>
+          } @if ((createForm.get('startDate')?.touched && createForm.get('startDate')?.invalid) ||
+          (createForm.get('endDate')?.touched && createForm.get('startDate')?.invalid)) {
+          <kendo-formerror> Date début et date fin sont requis</kendo-formerror>
+          }
+        </div>
+        @if(trigramme.authority === 'AZM') {
+        <kendo-formfield>
+          <kendo-label
+            text="Dossiers NextCare"
+            class="flex-row items-center gap-2 !w-full"
+            [for]="Nextcare">
+            <kendo-svgicon
+              kendoTooltip
+              title="Activer ce filtre pour afficher uniquement les données liées à Nextcare."
+              [icon]="infoCircleIcon"></kendo-svgicon>
+          </kendo-label>
+          <kendo-switch
+            formControlName="filtreNC"
+            #Nextcare>
+          </kendo-switch>
+        </kendo-formfield>
+        } @else {
+        <kendo-label text="Mode régleur">
+          <kendo-buttongroup selection="single">
+            <button
+              kendoButton
+              [toggleable]="true"
+              fillMode="outline"
+              [selected]="modeRegleur() === undefined"
+              (click)="modeRegleur.set(undefined)"
+              themeColor="primary"
+              type="button">
+              Général
+            </button>
+            <button
+              kendoButton
+              [toggleable]="true"
+              fillMode="outline"
+              [selected]="modeRegleur() === false"
+              (click)="modeRegleur.set(false)"
+              themeColor="primary"
+              type="button">
+              Intermédiaire
+            </button>
+            <button
+              kendoButton
+              [toggleable]="true"
+              fillMode="outline"
+              [selected]="modeRegleur() === true"
+              (click)="modeRegleur.set(true)"
+              themeColor="primary"
+              type="button">
+              Compagnie
+            </button>
+          </kendo-buttongroup>
+        </kendo-label>
+        }
+      </form>
+    </kendo-card-body>
+  </kendo-card>
+</div>
